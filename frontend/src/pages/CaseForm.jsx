@@ -276,8 +276,8 @@ export default function CaseForm() {
   }
 
   return (
-    <form className="form-page" onSubmit={submit}>
-      <div className="page-head">
+    <form className="form-page modern-case-form" onSubmit={submit}>
+      <div className="page-head modern-form-head">
         <div>
           <p className="eyebrow">Case Report</p>
           <h2>{editing ? 'Edit Missing Person' : 'Create Missing Person Report'}</h2>
@@ -288,8 +288,8 @@ export default function CaseForm() {
         </button>
       </div>
 
-      <section className="panel form-section">
-        <h3>Missing Person Information</h3>
+      <section className="panel form-section modern-form-card">
+        <div className="modern-section-heading"><span>01</span><h3>Missing Person Information</h3><p>Basic identity, photo, status, and urgency details.</p></div>
 
         <div className="form-grid two">
           <label className="field">
@@ -431,8 +431,8 @@ export default function CaseForm() {
         </label>
       </section>
 
-      <section className="panel form-section">
-        <h3>Guardian and Report</h3>
+      <section className="panel form-section modern-form-card">
+        <div className="modern-section-heading"><span>02</span><h3>Guardian and Report</h3><p>Reporter, guardian contact, and original narrative.</p></div>
 
         {editing && (
           <p className="muted">
@@ -483,8 +483,8 @@ export default function CaseForm() {
         </label>
       </section>
 
-      <section className="panel form-section">
-        <h3>Last Seen Location</h3>
+      <section className="panel form-section modern-form-card">
+        <div className="modern-section-heading"><span>03</span><h3>Last Seen Location</h3><p>Where the person was last seen and what barangay it belongs to.</p></div>
 
         {editing && (
           <p className="muted">
@@ -568,8 +568,8 @@ export default function CaseForm() {
         </div>
       </section>
 
-      <section className="panel form-section">
-        <h3>Police Station / Handling Agency</h3>
+      <section className="panel form-section modern-form-card">
+        <div className="modern-section-heading"><span>04</span><h3>Police Station / Handling Agency</h3><p>Station or agency responsible for handling the case.</p></div>
 
         {editing && (
           <p className="muted">

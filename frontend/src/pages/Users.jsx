@@ -1,5 +1,20 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Eye, EyeOff, Pencil, X } from 'lucide-react';
+import {
+  Eye,
+  EyeOff,
+  Pencil,
+  X,
+  Search,
+  UserPlus,
+  ShieldCheck,
+  MapPin,
+  Building2,
+  Trash2,
+  Save,
+  Users as UsersIcon,
+  UserCog,
+  BadgeCheck
+} from 'lucide-react';
 import api from '../services/api.js';
 import ConfirmDialog from '../components/ConfirmDialog.jsx';
 import { useToast } from '../components/ToastProvider.jsx';
@@ -14,6 +29,27 @@ const emptyUser = {
   assignment: '',
   assignmentType: 'Police Station'
 };
+
+const normalizeRole = role =>
+  role === 'System Admin' || role === 'Admin'
+    ? 'Administrator'
+    : role || 'Police Officer';
+
+function getInitials(name = '') {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+
+  if (parts.length === 0) return 'U';
+
+  return parts
+    .slice(0, 2)
+    .map(part => part[0])
+    .join('')
+    .toUpperCase();
+}
+
+function roleClass(role = '') {
+  return role.toLowerCase().replace(/\s+/g, '-');
+}
 
 export default function Users() {
   const { notify } = useToast();
@@ -50,6 +86,17 @@ export default function Users() {
 
     return options;
   }, [form.role, form.assignment]);
+
+  const stats = useMemo(() => {
+    const total = users.length;
+    const admins = users.filter(user =>
+      ['Administrator', 'System Admin', 'Admin'].includes(user.role)
+    ).length;
+    const police = users.filter(user => user.role === 'Police Officer').length;
+    const barangay = users.filter(user => user.role === 'Barangay Official').length;
+
+    return { total, admins, police, barangay };
+  }, [users]);
 
   const load = async () => {
     try {
@@ -90,6 +137,14 @@ export default function Users() {
               : 'System';
       }
 
+      if (key === 'assignment' && prev.role === 'Police Officer') {
+        next.assignmentType = 'Police Station';
+      }
+
+      if (key === 'assignment' && prev.role === 'Barangay Official') {
+        next.assignmentType = 'Barangay';
+      }
+
       return next;
     });
   };
@@ -101,10 +156,7 @@ export default function Users() {
   };
 
   const startEdit = user => {
-    const normalizedRole =
-      user.role === 'System Admin' || user.role === 'Admin'
-        ? 'Administrator'
-        : user.role || 'Police Officer';
+    const normalizedRole = normalizeRole(user.role);
 
     setEditingUser(user);
 
@@ -185,18 +237,87 @@ export default function Users() {
     }
   };
 
+  const clearFilters = () => {
+    setFilters({
+      search: '',
+      role: '',
+      assignment: ''
+    });
+  };
+
+  const hasFilters = filters.search || filters.role || filters.assignment;
+
   return (
-    <div>
-      <div className="page-head">
+    <div className="users-page modern-users-page">
+      <div className="modern-page-hero users-hero fade-in-up">
         <div>
           <p className="eyebrow">System Admin</p>
           <h2>User Management</h2>
+          <p>
+            Create, update, filter, and manage accounts for police officers,
+            barangay officials, and system administrators.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          className="primary modern-primary-action"
+          onClick={() => {
+            resetForm();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+        >
+          <UserPlus size={18} />
+          Add New User
+        </button>
+      </div>
+
+      <div className="users-stat-grid fade-in-up">
+        <div className="users-stat-card">
+          <div className="users-stat-icon">
+            <UsersIcon size={21} />
+          </div>
+          <div>
+            <span>Total Users</span>
+            <b>{stats.total}</b>
+          </div>
+        </div>
+
+        <div className="users-stat-card">
+          <div className="users-stat-icon">
+            <ShieldCheck size={21} />
+          </div>
+          <div>
+            <span>Police Officers</span>
+            <b>{stats.police}</b>
+          </div>
+        </div>
+
+        <div className="users-stat-card">
+          <div className="users-stat-icon">
+            <MapPin size={21} />
+          </div>
+          <div>
+            <span>Barangay Officials</span>
+            <b>{stats.barangay}</b>
+          </div>
+        </div>
+
+        <div className="users-stat-card">
+          <div className="users-stat-icon">
+            <UserCog size={21} />
+          </div>
+          <div>
+            <span>Admins</span>
+            <b>{stats.admins}</b>
+          </div>
         </div>
       </div>
 
-      <section className="panel form-section fade-in-up">
+      <section className="panel modern-user-form-panel fade-in-up">
         <div className="section-title-row">
           <div>
+            <p className="eyebrow">{editingUser ? 'Edit Account' : 'Create Account'}</p>
             <h3>
               {editingUser
                 ? `Edit ${editingUser.name}`
@@ -210,14 +331,18 @@ export default function Users() {
           </div>
 
           {editingUser && (
-            <button type="button" className="ghost small" onClick={resetForm}>
+            <button
+              type="button"
+              className="ghost-button user-cancel-edit-btn"
+              onClick={resetForm}
+            >
               <X size={16} />
               Cancel Edit
             </button>
           )}
         </div>
 
-        <form className="form-grid user-create-grid" onSubmit={submitUser}>
+        <form className="modern-user-form" onSubmit={submitUser}>
           <label className="field">
             <span>Full Name</span>
             <input
@@ -308,15 +433,17 @@ export default function Users() {
             </label>
           )}
 
-          <button className="primary" type="submit">
+          <button className="primary user-save-btn" type="submit">
+            <Save size={17} />
             {editingUser ? 'Save Changes' : 'Add User'}
           </button>
         </form>
       </section>
 
-      <section className="panel fade-in-up">
+      <section className="panel modern-user-list-panel fade-in-up">
         <div className="section-title-row">
           <div>
+            <p className="eyebrow">Registered Accounts</p>
             <h3>Registered Users</h3>
 
             <p className="muted">
@@ -326,17 +453,20 @@ export default function Users() {
           </div>
         </div>
 
-        <div className="filters user-filters">
-          <input
-            placeholder="Search name, email, role, assignment..."
-            value={filters.search}
-            onChange={e =>
-              setFilters(prev => ({
-                ...prev,
-                search: e.target.value
-              }))
-            }
-          />
+        <div className="modern-user-filters">
+          <div className="modern-search-field">
+            <Search size={18} />
+            <input
+              placeholder="Search name, email, role, assignment..."
+              value={filters.search}
+              onChange={e =>
+                setFilters(prev => ({
+                  ...prev,
+                  search: e.target.value
+                }))
+              }
+            />
+          </div>
 
           <select
             value={filters.role}
@@ -363,49 +493,96 @@ export default function Users() {
               }))
             }
           />
+
+          <button
+            className="ghost-button clear-user-filter-btn"
+            type="button"
+            disabled={!hasFilters}
+            onClick={clearFilters}
+          >
+            Clear
+          </button>
         </div>
 
-        {loading && <p className="muted">Loading users...</p>}
+        {loading && (
+          <div className="modern-loading-card">
+            <UsersIcon size={18} />
+            Loading users...
+          </div>
+        )}
 
         {!loading && users.length === 0 && (
-          <div className="empty-state">
+          <div className="empty-state modern-empty-state">
             <h3>No users found</h3>
             <p>Try changing the filters or add a new user above.</p>
           </div>
         )}
 
-        <div className="user-list">
-          {users.map(user => (
-            <div className="user-row user-row-editable" key={user.id}>
-              <div>
-                <b>{user.name}</b>
-                <small>{user.email}</small>
-              </div>
+        <div className="modern-user-grid">
+          {users.map(user => {
+            const displayRole = normalizeRole(user.role);
+            const assignment =
+              displayRole === 'Administrator'
+                ? 'System Administration'
+                : user.assignment || 'No assignment saved';
 
-              <span className="tag">{user.role}</span>
+            return (
+              <article className="modern-user-card" key={user.id}>
+                <div className="modern-user-card-top">
+                  <div className="modern-user-avatar">
+                    {getInitials(user.name)}
+                  </div>
 
-              <span>{user.assignment || 'System Administration'}</span>
+                  <div className="modern-user-title">
+                    <h4>{user.name}</h4>
+                    <small>{user.email}</small>
+                  </div>
 
-              <div className="user-actions">
-                <button
-                  type="button"
-                  className="ghost small"
-                  onClick={() => startEdit(user)}
-                >
-                  <Pencil size={15} />
-                  Edit
-                </button>
+                  <span className={`user-role-pill ${roleClass(displayRole)}`}>
+                    {displayRole}
+                  </span>
+                </div>
 
-                <button
-                  type="button"
-                  className="danger small"
-                  onClick={() => setDeleteTarget(user)}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
+                <div className="modern-user-meta">
+                  <span>
+                    {displayRole === 'Barangay Official' ? (
+                      <MapPin size={15} />
+                    ) : displayRole === 'Police Officer' ? (
+                      <Building2 size={15} />
+                    ) : (
+                      <BadgeCheck size={15} />
+                    )}
+                    {assignment}
+                  </span>
+
+                  <span>
+                    <ShieldCheck size={15} />
+                    {user.assignmentType || (displayRole === 'Administrator' ? 'System' : 'Assigned User')}
+                  </span>
+                </div>
+
+                <div className="modern-user-actions">
+                  <button
+                    type="button"
+                    className="ghost-button"
+                    onClick={() => startEdit(user)}
+                  >
+                    <Pencil size={15} />
+                    Edit
+                  </button>
+
+                  <button
+                    type="button"
+                    className="danger small"
+                    onClick={() => setDeleteTarget(user)}
+                  >
+                    <Trash2 size={15} />
+                    Delete
+                  </button>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </section>
 

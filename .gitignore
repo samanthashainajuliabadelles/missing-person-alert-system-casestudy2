@@ -5,8 +5,11 @@ backend/node_modules/
 
 # environment files
 .env
+.env.*
 frontend/.env
+frontend/.env.*
 backend/.env
+backend/.env.*
 
 # build outputs
 dist/
@@ -18,6 +21,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+*.log
 
 # OS/editor files
 .DS_Store
@@ -34,4 +38,3 @@ backups/
 # local database / temp files
 *.sqlite
 *.db
-*.log6

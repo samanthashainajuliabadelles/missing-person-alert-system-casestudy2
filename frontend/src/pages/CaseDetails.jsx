@@ -529,8 +529,8 @@ export default function CaseDetails() {
   }
 
   return (
-    <div className="case-details-page">
-      <div className="page-head">
+    <div className="case-details-page modern-case-details-page">
+      <div className="page-head modern-details-head">
         <div>
           <Link className="back-link no-print" to="/cases">
             ← Back to Cases
@@ -554,7 +554,7 @@ export default function CaseDetails() {
         </div>
       </div>
 
-      <div className="bonus-strip">
+      <div className="bonus-strip modern-bonus-strip">
         <div>
           <b>{duplicates.length}</b>
           <span>Possible duplicates</span>
@@ -576,7 +576,7 @@ export default function CaseDetails() {
         </div>
       </div>
 
-      <div className="detail-grid">
+      <div className="detail-grid modern-detail-grid">
         <section className="panel profile-panel improved-profile">
           <div className="profile-top">
             <div className="profile-photo-wrap">
@@ -857,7 +857,7 @@ export default function CaseDetails() {
         </section>
       )}
 
-      <section className="panel bonus-panel">
+      <section className="panel bonus-panel modern-tabs-panel">
         <div className="tab-row">
           <button
             className={activeBonusTab === 'path' ? 'tab active' : 'tab'}
@@ -1129,7 +1129,7 @@ export default function CaseDetails() {
       <ConfirmDialog
         open={deleteOpen}
         title="Delete this case?"
-        message="This removes the missing person node and its direct relationships from Neo4j. This action cannot be undone."
+        message="This will permanently delete this missing person case, including its related report details and sightings. This action cannot be undone."
         confirmText="Delete Case"
         danger
         onCancel={() => setDeleteOpen(false)}

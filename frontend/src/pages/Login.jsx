@@ -106,10 +106,6 @@ export default function Login() {
           </Link>
         </div>
 
-        <div className="hero-icon-badge">
-          <ShieldCheck size={34} />
-        </div>
-
         <h1>Missing Person and Community Alert Graph System</h1>
 
         <p>
